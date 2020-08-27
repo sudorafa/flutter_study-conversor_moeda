@@ -5,7 +5,19 @@ import 'package:flutter/material.dart';
 const request = "https://api.hgbrasil.com/finance?key=8a6cb208";
 
 void main() async {
-  runApp(MaterialApp(home: Home()));
+  runApp(MaterialApp(
+    home: Home(),
+    theme: ThemeData(
+        hintColor: Colors.amber,
+        primaryColor: Colors.white,
+        inputDecorationTheme: InputDecorationTheme(
+          enabledBorder:
+              OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+          focusedBorder:
+              OutlineInputBorder(borderSide: BorderSide(color: Colors.amber)),
+          hintStyle: TextStyle(color: Colors.amber),
+        )),
+  ));
 }
 
 Future<Map> getData() async {
@@ -19,6 +31,11 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  double dolar, euro;
+  final realController = TextEditingController();
+  final dolarController = TextEditingController();
+  final euroController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,10 +62,39 @@ class _HomeState extends State<Home> {
                           style: TextStyle(color: Colors.amber, fontSize: 25.0),
                           textAlign: TextAlign.center));
                 } else {
-                  return Container(color: Colors.green);
+                  dolar = snapshot.data["results"]["currencies"]["USD"]["buy"];
+                  euro = snapshot.data["results"]["currencies"]["EUR"]["buy"];
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Icon(Icons.monetization_on,
+                            size: 150.0, color: Colors.amber),
+                        buildTextField("Reais", "R\$", realController),
+                        Divider(),
+                        buildTextField("Dólares", "US\$", dolarController),
+                        Divider(),
+                        buildTextField("Euros", "€", euroController),
+                      ],
+                    ),
+                  );
                 }
             }
           }),
     );
   }
+}
+
+Widget buildTextField(
+    String label, String prefix, TextEditingController textEditingController) {
+  return TextField(
+    controller: textEditingController,
+    decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.amber),
+        border: OutlineInputBorder(),
+        prefixText: prefix),
+    style: TextStyle(color: Colors.amber, fontSize: 25.0),
+  );
 }
